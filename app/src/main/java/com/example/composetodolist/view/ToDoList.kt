@@ -84,34 +84,7 @@ fun ToDoList(navController: NavController) {
                 systemUiController.setSystemBarsColor(Green)
             }
 
-            val toDoList: MutableList<Task> = mutableListOf(
-                Task(
-                    task = "Play soccer",
-                    description = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                    priorityLevel = 0
-                ),
-                Task(
-                    task = "Go to cinema",
-                    description = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                    priorityLevel = 1
-                ),
-                Task(
-                    task = "Go to university",
-                    description = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                    priorityLevel = 2
-                ),
-                Task(
-                    task = "Last task",
-                    description = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                    priorityLevel = 3
-                )
-            )
-
-            LazyColumn {
-                itemsIndexed(toDoList) { position, _ ->
-                    taskItem(position, toDoList)
-                }
-            }
+            LazyColumn { }
         }
     }
 }

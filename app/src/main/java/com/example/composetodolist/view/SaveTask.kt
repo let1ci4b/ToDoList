@@ -1,6 +1,7 @@
 package com.example.composetodolist.view
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonColors
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,9 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.composetodolist.components.TextBox
 import com.example.composetodolist.components.saveButton
+import com.example.composetodolist.constant.Constants
+import com.example.composetodolist.repository.RepositoryTasks
 import com.example.composetodolist.ui.theme.Disabled_Green_Radio_Button
 import com.example.composetodolist.ui.theme.Disabled_Red_Radio_Button
 import com.example.composetodolist.ui.theme.Disabled_Yellow_Radio_Button
@@ -40,11 +44,18 @@ import com.example.composetodolist.ui.theme.Selected_Green_Radio_Button
 import com.example.composetodolist.ui.theme.Selected_Red_Radio_Button
 import com.example.composetodolist.ui.theme.Selected_Yellow_Radio_Button
 import com.example.composetodolist.ui.theme.White
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaveTask(navController: NavController) {
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val repositoryTasks = RepositoryTasks()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -166,7 +177,35 @@ fun SaveTask(navController: NavController) {
             }
 
             saveButton(
-                onClick = {
+                onClick = { // TODO refactor onclick
+
+                    var message = true
+
+                    scope.launch(Dispatchers.IO){
+                        if(taskTitle.isEmpty()) message = false
+                        else if(lowPriorityTask) {
+                            repositoryTasks.saveTask(taskTitle, taskDescription, Constants.LOW_PRIORITY)
+                            message = true
+                        } else if(mediumPriorityTask) {
+                            repositoryTasks.saveTask(taskTitle, taskDescription, Constants.MEDIUM_PRIORITY)
+                            message = true
+                        } else if(highPriorityTask) {
+                            repositoryTasks.saveTask(taskTitle, taskDescription, Constants.HIGH_PRIORITY)
+                            message = true
+                        } else {
+                            repositoryTasks.saveTask(taskTitle, taskDescription, Constants.NO_PRIORITY)
+                            message = true
+                        }
+                    }
+
+                    scope.launch(Dispatchers.Main) {
+                        if(message) {
+                            Toast.makeText(context, "Task saved successfully!", Toast.LENGTH_SHORT).show()
+                            navController.popBackStack()
+                        } else {
+                            Toast.makeText(context, "Enter the task title!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
 
             },
                 modifier = Modifier
