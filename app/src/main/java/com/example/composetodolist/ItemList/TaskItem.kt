@@ -1,23 +1,47 @@
 package com.example.composetodolist.ItemList
 
+import android.app.AlertDialog
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.NavController
 import com.example.composetodolist.R
 import com.example.composetodolist.model.Task
+import com.example.composetodolist.repository.RepositoryTasks
 import com.example.composetodolist.ui.theme.Black
 import com.example.composetodolist.ui.theme.Dark_Green
 import com.example.composetodolist.ui.theme.Selected_Green_Radio_Button
@@ -25,13 +49,47 @@ import com.example.composetodolist.ui.theme.Selected_Red_Radio_Button
 import com.example.composetodolist.ui.theme.Selected_Yellow_Radio_Button
 import com.example.composetodolist.ui.theme.White
 import com.example.composetodolist.ui.theme.shapePriorityCard
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun taskItem(position: Int, toDoList: MutableList<Task>){
+fun taskItem(position: Int,
+             toDoList: MutableList<Task>,
+             context: android.content.Context,
+             navController: NavController,
+             /*isEnabled: Boolean,
+             selectedItem: Boolean,
+             onClick: () -> Unit,
+             onEnableChange: (Boolean) -> Unit*/){
 
     val taskTitle = toDoList[position].task
     val taskDescription = toDoList[position].description
     val taskPriority = toDoList[position].priorityLevel
+
+    val scope = rememberCoroutineScope()
+    val repositoryTasks = RepositoryTasks()
+
+    fun deletionDialog(){
+
+        val alertDialog = AlertDialog.Builder(context)
+        alertDialog.setTitle("Delete Task")
+            .setMessage("Do you really want to delete this task?")
+            .setPositiveButton("Yes"){_, _ ->
+
+                repositoryTasks.deleteTask(taskTitle.toString())
+
+                scope.launch(Dispatchers.Main){
+                    toDoList.removeAt(position)
+                    navController.navigate("ToDoList") // TODO find a better way to refresh screen
+                    Toast.makeText(context, "Task successfully deleted!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("No"){_, _ ->
+
+            }
+            .show()
+    }
 
     var priorityLevel: String = when(taskPriority){
         0 -> { "No priority" }
@@ -54,7 +112,17 @@ fun taskItem(position: Int, toDoList: MutableList<Task>){
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp, 5.dp, 10.dp, 5.dp)
+            /*.combinedClickable(onLongClick = {
+                onEnableChange(true)
+            }, onClick = onClick )*/
     ) {
+        /*if (isEnabled) {
+            Checkbox(
+                checked = selectedItem, onCheckedChange = null, modifier = Modifier
+                    .padding(10.dp)
+                    .align(Alignment.End)
+            )
+        }*/
         ConstraintLayout (
             modifier = Modifier.padding(5.dp)
         ) {
@@ -70,18 +138,18 @@ fun taskItem(position: Int, toDoList: MutableList<Task>){
                 }
             )
 
+            /// TODO revise card space when a task hasn't a description
             Text(
                 text = taskDescription.toString(),
                 color = Black,
                 fontSize = 12.sp,
                 modifier = Modifier.constrainAs(textDescription){
-                    top.linkTo(textTitle.bottom, margin = 10.dp)
+                    top.linkTo(textTitle.bottom, margin = 5.dp)
                     start.linkTo(parent.start, margin = 10.dp)
-                    end.linkTo(parent.end, margin = 10.dp)
-                    width = Dimension.preferredWrapContent
+                    bottom.linkTo(textPriority.top, margin = 5.dp)
                 }
             )
-
+            /// TODO discover priority level error
             Text(
                 text = priorityLevel,
                 color = Black,
@@ -90,7 +158,7 @@ fun taskItem(position: Int, toDoList: MutableList<Task>){
                 modifier = Modifier.constrainAs(textPriority){
                     top.linkTo(textDescription.bottom)
                     start.linkTo(parent.start, margin = 10.dp)
-                    bottom.linkTo(parent.bottom, margin = 5.dp)
+                    bottom.linkTo(parent.bottom, margin = 10.dp)
                 }
             )
 
@@ -107,18 +175,78 @@ fun taskItem(position: Int, toDoList: MutableList<Task>){
                     },
                 shape = shapePriorityCard.large
             ) { }
-
-            IconButton(
-                onClick = { },
+            /// TODO delete in onlongclick
+            /*IconButton(
+                onClick = {
+                    deletionDialog()
+                },
                 modifier = Modifier.constrainAs(deleteButton){
                     top.linkTo(textDescription.bottom)
                     end.linkTo(parent.end, margin = 0.dp)
-                    bottom.linkTo(parent.bottom, margin = 5.dp)
                 }
            ) {
                 Image(imageVector = ImageVector.vectorResource(id = R.drawable.ic_delete),
                     contentDescription = "Icon to delete task.")
-            }
+            }*/
         }
     }
+
+    @Composable
+    fun EachRow(isEnabled: Any, title: String, selectedItem: Any, onClick: () -> Unit, onEnableChange: Any) {
+
+    }
+
+    /*@Composable
+    fun selectItems() {
+
+        var isEnabled by remember { mutableStateOf(false) }
+        var selectedItems by remember { mutableStateOf<Set<Int>>(emptySet()) }
+        var selectAll by remember { mutableStateOf(false) }
+
+        LaunchedEffect(key1 = selectAll) {
+            selectedItems = if (selectAll)
+                selectedItems.plus(0..10)
+            else
+                selectedItems.minus(0..10)
+        }
+
+        Column {
+            Row(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = selectAll,
+                        onValueChange = {
+                            selectAll = it
+                            isEnabled = it
+                        },
+                        role = Role.Checkbox
+                    )
+            ) {
+                Text(text = stringResource(R.string.select_all), modifier = Modifier.weight(1f))
+                Checkbox(checked = selectAll, onCheckedChange = null)
+            }
+
+            LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                items(10) { index ->
+                    EachRow(
+                        isEnabled = isEnabled,
+                        title = "Item $index",
+                        selectedItem = selectedItems.contains(index),
+                        onClick = {
+                            selectedItems =
+                                if (selectedItems.contains(index)) selectedItems.minus(index)
+                                else selectedItems.plus(index)
+                        },
+                        onEnableChange = { value: Boolean ->
+                            isEnabled = value
+                        },
+                    )
+                }
+            }
+
+        }
+
+    }*/
 }

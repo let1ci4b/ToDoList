@@ -17,9 +17,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.invalidateGroupsWithKey
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,6 +30,7 @@ import androidx.navigation.NavController
 import com.example.composetodolist.ItemList.taskItem
 import com.example.composetodolist.R
 import com.example.composetodolist.model.Task
+import com.example.composetodolist.repository.RepositoryTasks
 import com.example.composetodolist.ui.theme.Dark_Green
 import com.example.composetodolist.ui.theme.Green
 import com.example.composetodolist.ui.theme.White
@@ -39,7 +42,8 @@ import com.google.firebase.Firebase
 @Composable
 fun ToDoList(navController: NavController) {
 
-    Firebase
+    val repositoryTasks = RepositoryTasks()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -84,7 +88,13 @@ fun ToDoList(navController: NavController) {
                 systemUiController.setSystemBarsColor(Green)
             }
 
-            LazyColumn { }
+            val todoList = repositoryTasks.rescueTasks().collectAsState(mutableListOf()).value
+
+            LazyColumn {
+                itemsIndexed(todoList){position, _, ->
+                    taskItem(position = position, toDoList = todoList, context, navController)
+                }
+            }
         }
     }
 }

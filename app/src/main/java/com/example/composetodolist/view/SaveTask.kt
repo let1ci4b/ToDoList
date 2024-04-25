@@ -75,29 +75,12 @@ fun SaveTask(navController: NavController) {
         containerColor = White,
     ) {
 
-        var taskTitle by remember {
-            mutableStateOf("")
-        }
-
-        var taskDescription by remember {
-            mutableStateOf("")
-        }
-
-        var noPriorityTask by remember {
-            mutableStateOf(false)
-        }
-
-        var lowPriorityTask by remember {
-            mutableStateOf(false)
-        }
-
-        var mediumPriorityTask by remember {
-            mutableStateOf(false)
-        }
-
-        var highPriorityTask by remember {
-            mutableStateOf(false)
-        }
+        var taskTitle by remember { mutableStateOf("") }
+        var taskDescription by remember { mutableStateOf("") }
+        var noPriorityTask by remember { mutableStateOf(false) }
+        var lowPriorityTask by remember { mutableStateOf(false) }
+        var mediumPriorityTask by remember { mutableStateOf(false) }
+        var highPriorityTask by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
