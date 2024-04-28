@@ -3,13 +3,13 @@ package com.example.composetodolist.components
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.composetodolist.ui.theme.Green
+import com.example.composetodolist.ui.theme.Gray
 import com.example.composetodolist.ui.theme.White
 
 @Composable
@@ -22,8 +22,8 @@ fun saveButton(
         onClick,
         modifier,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Green,
-            contentColor = White
+            containerColor = MaterialTheme.colorScheme.tertiary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
         ),
         shape = RoundedCornerShape(10)
     ) {

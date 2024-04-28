@@ -3,47 +3,26 @@ package com.example.composetodolist.ItemList
 import android.app.AlertDialog
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
-import com.example.composetodolist.R
 import com.example.composetodolist.model.Task
 import com.example.composetodolist.repository.RepositoryTasks
 import com.example.composetodolist.ui.theme.Black
-import com.example.composetodolist.ui.theme.Dark_Green
+import com.example.composetodolist.ui.theme.Light_Black
 import com.example.composetodolist.ui.theme.Selected_Green_Radio_Button
 import com.example.composetodolist.ui.theme.Selected_Red_Radio_Button
 import com.example.composetodolist.ui.theme.Selected_Yellow_Radio_Button
@@ -99,7 +78,7 @@ fun taskItem(position: Int,
     }
 
     val priorityColor = when(taskPriority){
-        0 -> { Dark_Green }
+        0 -> { MaterialTheme.colorScheme.onSecondary }
         1 -> { Selected_Green_Radio_Button }
         2 -> { Selected_Yellow_Radio_Button }
         else -> { Selected_Red_Radio_Button }
@@ -107,11 +86,12 @@ fun taskItem(position: Int,
 
     Card (
        colors = CardDefaults.cardColors(
-           containerColor = White
+           containerColor = MaterialTheme.colorScheme.onPrimary
        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp, 5.dp, 10.dp, 5.dp)
+            .background(MaterialTheme.colorScheme.primary)
             /*.combinedClickable(onLongClick = {
                 onEnableChange(true)
             }, onClick = onClick )*/
@@ -130,7 +110,7 @@ fun taskItem(position: Int,
 
             Text(
                 text = taskTitle.toString(),
-                color = Black,
+                color = MaterialTheme.colorScheme.tertiary,
                 fontSize = 14.sp,
                 modifier = Modifier.constrainAs(textTitle){
                     top.linkTo(parent.top, margin = 10.dp)
@@ -141,7 +121,7 @@ fun taskItem(position: Int,
             /// TODO revise card space when a task hasn't a description
             Text(
                 text = taskDescription.toString(),
-                color = Black,
+                color = MaterialTheme.colorScheme.tertiary,
                 fontSize = 12.sp,
                 modifier = Modifier.constrainAs(textDescription){
                     top.linkTo(textTitle.bottom, margin = 5.dp)
@@ -152,7 +132,7 @@ fun taskItem(position: Int,
             /// TODO discover priority level error
             Text(
                 text = priorityLevel,
-                color = Black,
+                color = MaterialTheme.colorScheme.tertiary,
                 fontSize = 12.sp,
 
                 modifier = Modifier.constrainAs(textPriority){
